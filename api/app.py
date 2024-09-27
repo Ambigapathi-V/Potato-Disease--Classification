@@ -67,3 +67,4 @@ st.sidebar.write(
 # Footer
 st.markdown("---")
 st.markdown("<small style='text-align: center;'>Developed with ❤️ by Ambigapathi</small>", unsafe_allow_html=True)
+
