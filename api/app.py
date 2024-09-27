@@ -5,16 +5,20 @@ from PIL import Image
 import tensorflow as tf
 import os
 
+# Define model path (use forward slashes or double backslashes)
+model_path = "saved_models/1.keras"  # Change this to your model's path
+
 # Check if the model path exists
-model_path = "./saved_models/1.keras"
 if os.path.exists(model_path):
     try:
         MODEL = tf.keras.models.load_model(model_path)
         CLASS_NAMES = ["Early Blight", "Late Blight", "Healthy"]
     except Exception as e:
         st.error(f"Error loading the model: {e}")
+        st.stop()  # Stop execution if model fails to load
 else:
     st.error("Model file not found. Please check the path.")
+    st.stop()  # Stop execution if model is not found
 
 # Function to read image file
 def read_file_as_image(data) -> np.ndarray:
@@ -38,11 +42,15 @@ if uploaded_files:
         # Convert the image data to a numpy array
         image = read_file_as_image(image_data)
         
+        # Resize the image to the input size expected by your model
+        image_resized = Image.fromarray(image).resize((256, 256))  # Resize to 256x256
+        image_array = np.array(image_resized) / 255.0  # Normalize the image
+        
         # Display a smaller version of the uploaded image with styling
         st.image(image, caption=f'Uploaded Image: {uploaded_file.name}', width=150, output_format='auto')
 
         # Prepare the image for prediction
-        img_batch = np.expand_dims(image, 0)
+        img_batch = np.expand_dims(image_array, axis=0)  # Expand dims to create batch
 
         # Predict the class
         predictions = MODEL.predict(img_batch)
